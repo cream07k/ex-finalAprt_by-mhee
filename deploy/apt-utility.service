@@ -1,0 +1,56 @@
+# ════════════════════════════════════════════
+#  /etc/systemd/system/apt-utility.service
+#
+#  เปิดใช้งาน:
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable --now apt-utility
+#    sudo systemctl status apt-utility
+#    sudo journalctl -u apt-utility -f
+# ════════════════════════════════════════════
+
+[Unit]
+Description=APT Utility (Next.js standalone)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=apt
+Group=apt
+WorkingDirectory=/var/www/apt-utility
+EnvironmentFile=/var/www/apt-utility/.env.local
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+ExecStart=/usr/bin/node /var/www/apt-utility/.next/standalone/server.js
+
+# ── Restart policy ──
+Restart=on-failure
+RestartSec=5s
+StartLimitInterval=60s
+StartLimitBurst=5
+
+# ── Resource limits ──
+MemoryMax=1G
+LimitNOFILE=4096
+
+# ── Hardening ──
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/apt-utility/.next /var/www/apt-utility/logs
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=true
+
+# ── Logging ──
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=apt-utility
+
+[Install]
+WantedBy=multi-user.target

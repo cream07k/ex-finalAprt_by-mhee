@@ -1,0 +1,550 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════
+   DESIGN TOKENS  (ชื่อเดียวกันทั้ง project)
+══════════════════════════════════════════ */
+:root {
+  --sidebar-w: 0px;
+  /* surface */
+  --s0: #0a0e1a;          /* body bg */
+  --s1: rgba(18,25,42,0.75);  /* card */
+  --s2: rgba(26,34,56,0.80);  /* card raised */
+  --s3: rgba(14,20,36,0.92);  /* modal/pop */
+
+  /* border */
+  --b1: rgba(255,255,255,0.08);
+  --b2: rgba(255,255,255,0.14);
+
+  /* text */
+  --t1: #eef2ff;   /* primary */
+  --t2: #94a3b8;   /* secondary */
+  --t3: #475569;   /* muted */
+
+  /* accent */
+  --accent:    #5b8dee;
+  --accent-hi: #93c5fd;
+
+  /* status */
+  --ok:   #22c55e;
+  --warn: #f59e0b;
+  --err:  #f87171;
+
+  /* data colors */
+  --c-elec:  #fbbf24;
+  --c-water: #38bdf8;
+  --c-rent:  #a78bfa;
+  --c-total: #4ade80;
+
+  /* radius */
+  --r1: 8px;
+  --r2: 14px;
+  --r3: 20px;
+  --r4: 26px;
+}
+
+/* ══════════════════════════════════════════
+   BASE
+══════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* ป้องกัน Safari iOS overscroll bounce ดึง content */
+  overscroll-behavior-y: none;
+}
+
+/* ── ป้องกันลากรูป + ป้องกัน select ที่ไม่ใช่ input ── */
+img, video, svg {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+}
+button, .glass, .glass-pop, .glass-xs {
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* แต่ input/textarea ต้อง select ได้ */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+body {
+  font-family: 'Sarabun', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--t1);
+  min-height: 100vh;        /* fallback Safari < 15.4 */
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-font-smoothing: antialiased;
+
+  background-color: var(--s0);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 10%,  rgba(91,141,238,0.20) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 90% 90%,  rgba(124,109,240,0.16) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,  rgba(34,211,238,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 40% at 20% 80%,  rgba(74,222,128,0.05) 0%, transparent 50%);
+  background-size: 200% 200%;
+  animation: bgShift 20s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════ */
+::-webkit-scrollbar            { width: 4px; height: 4px; }
+::-webkit-scrollbar-track      { background: transparent; }
+::-webkit-scrollbar-thumb      { background: rgba(255,255,255,0.1); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,0.2); }
+
+/* ══════════════════════════════════════════
+   GLASS
+══════════════════════════════════════════ */
+.glass {
+  background: var(--s1);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--b1);
+  border-radius: var(--r3);
+}
+.glass-light {
+  background: var(--s2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--b1);
+  border-radius: var(--r3);
+}
+.glass-xs {
+  background: var(--s2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--b1);
+  border-radius: var(--r2);
+}
+.glass-pop {
+  background: var(--s3);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--b2);
+  border-radius: var(--r4);
+  box-shadow: 0 32px 72px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* ══════════════════════════════════════════
+   CARD HOVER
+══════════════════════════════════════════ */
+.card-lift,
+.card-interactive {
+  transition: transform 220ms cubic-bezier(.34,1.4,.64,1),
+              box-shadow 220ms ease, border-color 220ms ease;
+}
+.card-lift:hover,
+.card-interactive:hover {
+  transform: translateY(-4px);
+  border-color: rgba(91,141,238,0.4) !important;
+  box-shadow: 0 20px 52px rgba(0,0,0,0.4),
+              0 0 0 1px rgba(91,141,238,0.14),
+              0 0 40px rgba(91,141,238,0.07);
+}
+
+/* ══════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════ */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 20px;
+  min-height: 44px;
+  background: linear-gradient(135deg, var(--accent) 0%, #7c6df0 100%);
+  color: #fff; font-weight: 700; font-size: 14px; font-family: inherit;
+  border: none; border-radius: var(--r2); cursor: pointer;
+  box-shadow: 0 4px 18px rgba(91,141,238,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 160ms ease;
+  position: relative; overflow: hidden;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none;
+}
+.btn-primary::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent);
+  pointer-events: none;
+}
+.btn-primary:hover  { background: linear-gradient(135deg, #6b9ef8, #8d7ef5); box-shadow: 0 6px 26px rgba(91,141,238,0.5), inset 0 1px 0 rgba(255,255,255,0.15); transform: translateY(-1px); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 20px;
+  min-height: 44px;
+  background: transparent; color: var(--t2);
+  font-weight: 600; font-size: 14px; font-family: inherit;
+  border: 1px solid var(--b2); border-radius: var(--r2); cursor: pointer;
+  transition: all 160ms ease; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none;
+}
+.btn-ghost:hover  { background: rgba(255,255,255,0.06); color: var(--t1); border-color: rgba(255,255,255,0.22); }
+.btn-ghost:active { transform: scale(0.97); }
+
+/* ══════════════════════════════════════════
+   INPUTS
+══════════════════════════════════════════ */
+.input-dark {
+  width: 100%; padding: 12px 16px;
+  background: rgba(8,12,24,0.8);
+  border: 1.5px solid var(--b2);
+  border-radius: var(--r2);   /* 14px — โค้งสวยขึ้น */
+  color: var(--t1);
+  font-size: 16px;        /* ≥16px กัน iOS Safari auto-zoom เวลา focus */
+  font-family: inherit; line-height: 1.5;
+  outline: none; -webkit-appearance: none; appearance: none;
+  transition: border-color 160ms, box-shadow 160ms, background 160ms;
+  min-height: 44px;       /* Apple HIG touch target */
+}
+.input-dark::placeholder { color: var(--t3); }
+.input-dark:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(91,141,238,0.18);
+}
+.input-dark option { background: #1a2235; color: var(--t1); }
+
+/* ══════════════════════════════════════════
+   BADGES
+══════════════════════════════════════════ */
+.badge-green  { display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(34,197,94,0.13);color:#4ade80;border:1px solid rgba(34,197,94,0.28); }
+.badge-red    { display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(248,113,113,0.13);color:#fca5a5;border:1px solid rgba(248,113,113,0.28); }
+.badge-amber  { display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(251,191,36,0.13);color:#fde68a;border:1px solid rgba(251,191,36,0.28); }
+.badge-blue   { display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(91,141,238,0.14);color:#93c5fd;border:1px solid rgba(91,141,238,0.3); }
+.badge-cyan   { display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(34,211,238,0.11);color:#67e8f9;border:1px solid rgba(34,211,238,0.24); }
+.badge-purple { display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(167,139,250,0.13);color:#c4b5fd;border:1px solid rgba(167,139,250,0.27); }
+
+/* ══════════════════════════════════════════
+   GRADIENT TEXT
+══════════════════════════════════════════ */
+.gradient-text       { background:linear-gradient(120deg,#93c5fd,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.gradient-text-gold  { background:linear-gradient(120deg,#fde68a,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.gradient-text-green { background:linear-gradient(120deg,#4ade80,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.gradient-text-cyan  { background:linear-gradient(120deg,#22d3ee,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+
+/* ══════════════════════════════════════════
+   MISC
+══════════════════════════════════════════ */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--b2), transparent);
+}
+.dot-live {
+  width: 7px; height: 7px; border-radius: 50%; display: inline-block;
+  background: var(--ok);
+  box-shadow: 0 0 8px rgba(34,197,94,0.8);
+  animation: dotPulse 2.4s ease-in-out infinite;
+}
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* ── iPad mini portrait (768-834px) ── */
+@media (min-width: 768px) and (max-width: 834px) {
+  .page-container { padding-left: clamp(1rem, 3vw, 1.5rem); padding-right: clamp(1rem, 3vw, 1.5rem); }
+}
+
+/* ── iPhone landscape (small height) ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .page-container { padding-top: 1rem; padding-bottom: 1rem; gap: 1rem; }
+}
+
+/* ── Range slider thumb (music volume) ── */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #a78bfa;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(167,139,250,0.5);
+  transition: transform 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #a78bfa;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(167,139,250,0.5);
+}
+
+/* ── Layout ── */
+.main-content {
+  min-height: 100vh;        /* Safari fallback */
+  min-height: 100dvh;
+  padding-top:    calc(4rem + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+  padding-left:   env(safe-area-inset-left,  0px);
+  padding-right:  env(safe-area-inset-right, 0px);
+}
+@media (min-width: 768px) {
+  .main-content {
+    padding-top:    2rem;
+    padding-bottom: 3rem;
+    padding-left:   calc(14rem + env(safe-area-inset-left, 0px));
+  }
+}
+
+/* ── Spacing helpers ── */
+.page-container {
+  width: 100%;
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top:    clamp(2rem, 4vw, 3rem);
+  /* +5rem ป้องกัน MusicPlayer/floating button ทับ content บน mobile */
+  padding-bottom: calc(clamp(3rem, 6vw, 5rem) + env(safe-area-inset-bottom, 0px) + 4rem);
+  padding-left:   clamp(1.25rem, 3vw, 2rem);
+  padding-right:  clamp(1.25rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+}
+@media (min-width: 768px) {
+  .page-container { padding-bottom: calc(clamp(3rem, 6vw, 5rem) + env(safe-area-inset-bottom, 0px) + 2rem); }
+}
+
+/* ── Tailwind spacing override (ทั่วทั้งระบบ ครอบคลุม modal และ public pages) ── */
+.space-y-1   > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem  !important; } /* 4 → 8px */
+.space-y-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.625rem !important; } /* 6 → 10px */
+.space-y-2   > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem !important; } /* 8 → 12px */
+.space-y-3   > :not([hidden]) ~ :not([hidden]) { margin-top: 1.125rem !important; } /* 12 → 18px */
+.space-y-4   > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem  !important; } /* 16 → 24px */
+.space-y-5   > :not([hidden]) ~ :not([hidden]) { margin-top: 1.875rem !important; } /* 20 → 30px */
+
+/* Title + subtitle pattern: เพิ่มระยะ mt-0.5 และ mt-1 */
+h1 + p[class*="mt-0.5"], h2 + p[class*="mt-0.5"], h3 + p[class*="mt-0.5"],
+h1 + p.mt-1, h2 + p.mt-1, h3 + p.mt-1 {
+  margin-top: 0.375rem !important; /* 2 → 6px */
+}
+
+/* Glass card padding ขั้นต่ำ: ป้องกัน p-3 ที่แน่น */
+.glass.p-3 { padding: 1rem !important; }      /* 12 → 16px */
+.glass.p-4 { padding: 1.25rem !important; }   /* 16 → 20px */
+
+
+@media (min-width: 768px) {
+  :root { --sidebar-w: 224px; }
+}
+
+/* ══════════════════════════════════════════
+   📱 MOBILE / TOUCH OPTIMIZATIONS (Phase A)
+══════════════════════════════════════════ */
+
+/* iOS HIG: tap target ≥ 44x44px — บังคับทุกปุ่ม/link */
+button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+  touch-action: manipulation;        /* กัน double-tap zoom */
+  -webkit-tap-highlight-color: transparent;
+}
+@media (pointer: coarse) {
+  button:not(.no-min-tap), a.btn-primary, a.btn-ghost, [role="button"]:not(.no-min-tap) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* iOS: กัน input zoom เข้าหน้าจอตอน focus (font-size ≥ 16px) */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Active state มือถือ: feedback ชัดเจนแทน hover (mobile ไม่มี hover) */
+@media (hover: none) {
+  button:active, a:active, [role="button"]:active {
+    opacity: 0.7;
+    transition: opacity 0.1s;
+  }
+}
+
+/* Safe area inset สำหรับ modal เต็มจอ (iPhone notch + home indicator) */
+.fixed.inset-0 {
+  padding-top:    env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left:   env(safe-area-inset-left, 0px);
+  padding-right:  env(safe-area-inset-right, 0px);
+}
+
+/* Modal/sheet ที่ติดล่าง — ดันขึ้นพ้น home indicator iOS */
+.glass-pop, [class*="rounded-t-3xl"] {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* Smooth scroll on iOS */
+html, body {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* ป้องกัน text selection accidentally on tap (mobile only) */
+@media (pointer: coarse) {
+  button, .glass, .badge-green, .badge-red, .badge-amber, .badge-blue {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; }
+}
+
+/* ══════════════════════════════════════════
+   📱 iPad / Tablet Optimization (Phase D)
+══════════════════════════════════════════ */
+
+/* iPad portrait (768-1024px): sidebar เล็กลง + content กว้างขึ้น */
+@media (min-width: 768px) and (max-width: 1024px) {
+  :root { --sidebar-w: 200px; }
+  .main-content {
+    padding-left: calc(200px + env(safe-area-inset-left, 0px)) !important;
+  }
+  /* Grid 2 → 3 columns บน iPad portrait */
+  .grid.grid-cols-2.sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* iPad landscape: ใช้ sidebar เต็ม + content max-width ขยาย */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .page-container { max-width: 80rem; }
+}
+
+/* ป้องกัน sidebar ทับ content บน landscape ที่ height ต่ำ */
+@media (min-width: 768px) and (max-height: 600px) {
+  .page-container {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* ══════════════════════════════════════════
+   ✨ VISUAL POLISH (Phase B)
+══════════════════════════════════════════ */
+
+/* Loading skeleton shimmer */
+@keyframes skel-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.04) 100%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.6s linear infinite;
+  border-radius: 0.75rem;
+}
+
+/* Spring-like button press feedback */
+button, [role="button"] {
+  transition:
+    transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.15s ease;
+}
+
+/* Card hover: subtle lift บน desktop */
+@media (hover: hover) {
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  }
+}
+
+/* Focus ring สวยขึ้น (accessibility) */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent-hi);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Scrollbar styling (desktop only) */
+@media (pointer: fine) {
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.25);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); background-clip: padding-box; border: 2px solid transparent; }
+}
+
+/* Reduced motion (accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes bgShift {
+  0%   { background-position: 0%   0%;   }
+  25%  { background-position: 100% 0%;   }
+  50%  { background-position: 100% 100%; }
+  75%  { background-position: 0%   100%; }
+  100% { background-position: 0%   0%;   }
+}
+@keyframes dotPulse {
+  0%,100% { transform: scale(1);    opacity: 1;    }
+  50%      { transform: scale(0.55); opacity: 0.35; }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0);    }
+  50%      { transform: translateY(-7px); }
+}
+@keyframes spinSmooth { to { transform: rotate(360deg); } }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.animate-float    { animation: float 3s ease-in-out infinite; }
+.spin-smooth      { animation: spinSmooth .75s linear infinite; }
+.animate-fade-up  { animation: fadeUp .38s cubic-bezier(.22,1,.36,1) both; }
+
+.shimmer-skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%; animation: shimmer 1.6s infinite; border-radius: 6px;
+}
+
+/* stagger */
+.stagger > *:nth-child(1) { animation-delay: 0ms;   }
+.stagger > *:nth-child(2) { animation-delay: 55ms;  }
+.stagger > *:nth-child(3) { animation-delay: 110ms; }
+.stagger > *:nth-child(4) { animation-delay: 165ms; }
+.stagger > *:nth-child(5) { animation-delay: 220ms; }
+.stagger > *:nth-child(6) { animation-delay: 275ms; }
+.stagger > *:nth-child(7) { animation-delay: 330ms; }
+.stagger > *:nth-child(8) { animation-delay: 385ms; }
+
+/* focus */
+input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible {
+  outline: 2px solid rgba(91,141,238,0.6); outline-offset: 2px;
+}
+/* hide number spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+input[type=month], input[type=date] { color-scheme: dark; }

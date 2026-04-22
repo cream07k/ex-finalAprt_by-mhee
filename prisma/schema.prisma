@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════
+//  ห้องพัก
+// ═══════════════════════════════════════
+model Room {
+  id         String  @id              // = roomNumber เช่น "101", "A-201"
+  roomNumber String  @unique
+  floor      String?                  // ชั้น
+  rent       Float   @default(0)      // ค่าเช่า/เดือน (บาท)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenancies      Tenancy[]
+  billingRecords BillingRecord[]
+}
+
+// ═══════════════════════════════════════
+//  ผู้เช่า
+// ═══════════════════════════════════════
+model Tenant {
+  id        String  @id               // T-0001, T-0002, ...
+  name      String                    // ชื่อ-นามสกุล
+  phone     String?                   // เบอร์โทร
+  lineId    String?                   // LINE ID
+  idCard    String?                   // เลขบัตรประชาชน 13 หลัก
+  note      String?                   // หมายเหตุ
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenancies Tenancy[]
+}
+
+// ═══════════════════════════════════════
+//  ประวัติการเช่า  (ผู้เช่า ↔ ห้อง)
+// ═══════════════════════════════════════
+model Tenancy {
+  id        String    @id             // TNC-101-T0001-2025-01-01
+  roomId    String
+  tenantId  String
+  startDate DateTime                  // วันที่เริ่มเช่า
+  endDate   DateTime?                 // วันที่ออก (null = ยังอยู่)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+
+  room   Room   @relation(fields: [roomId],   references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([tenantId])
+}
+
+// ═══════════════════════════════════════
+//  บิลค่าน้ำ-ค่าไฟรายเดือน
+//  id = BILL-{roomNumber}-{YYYY-MM}
+//  เช่น  BILL-101-2025-06
+// ═══════════════════════════════════════
+model BillingRecord {
+  id           String  @id             // BILL-101-2025-06
+  roomId       String
+  tenantName   String  @default("")    // snapshot ชื่อผู้เช่า ณ วันออกบิล
+  billingMonth String                  // YYYY-MM เช่น "2025-06"
+
+  // ── ไฟฟ้า ──
+  prevElectric Float @default(0)       // มิเตอร์เดือนที่แล้ว (หน่วย)
+  currElectric Float @default(0)       // มิเตอร์เดือนนี้ (หน่วย)
+  electricRate Float @default(0)       // ราคา/หน่วย (บาท)
+  electricCost Float @default(0)       // ค่าไฟรวม (บาท)
+
+  // ── น้ำประปา ──
+  prevWater    Float @default(0)       // มิเตอร์เดือนที่แล้ว (หน่วย)
+  currWater    Float @default(0)       // มิเตอร์เดือนนี้ (หน่วย)
+  waterRate    Float @default(0)       // ราคา/หน่วย (บาท)
+  waterCost    Float @default(0)       // ค่าน้ำรวม (บาท)
+
+  // ── ค่าใช้จ่ายอื่น ──
+  rent         Float  @default(0)      // ค่าเช่าห้อง (บาท)
+  otherFee     Float  @default(0)      // ค่าอื่นๆ (บาท)
+  otherFeeNote String @default("")     // หมายเหตุ เช่น "ค่าอินเทอร์เน็ต"
+  total        Float  @default(0)      // ยอดรวมทั้งหมด (บาท)
+
+  // ── สถานะชำระเงิน ──
+  isPaid         Boolean   @default(false)
+  paidAt         DateTime?             // วันที่ชำระ
+  slipRef        String?               // reference สลิปโอนเงิน
+  slipVerifiedAt DateTime?             // วันที่ verify สลิป
+  paymentMethod  String?               // "slip" | "cash" | null
+  paidBy         String?               // ชื่อผู้จ่าย (กรณี cash หรือดึงจาก slip sender)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, billingMonth])
+  @@index([roomId])
+  @@index([billingMonth])
+}
+
+// ═══════════════════════════════════════
+//  ตั้งค่าระบบ  (มีแถวเดียวเสมอ id = 1)
+// ═══════════════════════════════════════
+model Settings {
+  id            Int    @id @default(1)
+  electricRate  Float  @default(8)     // ค่าไฟ บาท/หน่วย
+  waterRate     Float  @default(18)    // ค่าน้ำ บาท/หน่วย
+  apartmentName String @default("อพาร์ตเมนต์ของฉัน")
+  promptPayId   String @default("")    // เบอร์/เลขบัตร PromptPay
+  // ── ข้อมูลที่จะแสดงในใบแจ้งหนี้ / ใบเสร็จ ──
+  apartmentAddress String @default("")     // ที่อยู่
+  apartmentPhone   String @default("")     // เบอร์ติดต่อ
+  apartmentLogo    String @default("")     // base64 data URL หรือ URL รูป
+  invoiceFooter    String @default("ขอบคุณที่ชำระตรงเวลา")  // ข้อความ footer ใบแจ้ง
+  receiptFooter    String @default("ขอบคุณที่ชำระค่าเช่า")    // ข้อความ footer ใบเสร็จ
+  updatedAt     DateTime @updatedAt
+}
